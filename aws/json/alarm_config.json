@@ -1,0 +1,34 @@
+{
+    "AlarmName": "DailyEstimatedChargesAlarm",
+    "AlarmDescription": "Alarm to monitor daily estimated charges",
+    "ActionsEnabled": true,
+    "AlarmActions": [
+      "arn:aws:sns:us-east-1:010928211139:billing-alarm"
+    ],
+    "Metrics": [
+      {
+        "Id": "m1",
+        "MetricStat": {
+          "Metric": {
+            "Namespace": "AWS/Billing",
+            "MetricName": "EstimatedCharges",
+            "Dimensions": [
+              {
+                "Name": "Currency",
+                "Value": "USD"
+              }
+            ]
+          },
+          "Period": 86400,
+          "Stat": "Maximum",
+          "Unit": "None"
+        },
+        "ReturnData": true
+      }
+    ],
+    "EvaluationPeriods": 1,
+    "Threshold": 1,
+    "ComparisonOperator": "GreaterThanOrEqualThreshold",
+    "TreatMissingData": "breaching"
+  }
+  
