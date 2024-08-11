@@ -3,4 +3,4 @@ aws budgets create-budget \
     --budget file://aws/json/budget.json \
     --notifications-with-subscribers file://aws/json/budget-notifications-with-subscribers.json
 
-aws cloudwatch put-metric-alarm --cli-input-json file://aws/json/alarm_config.json
+aws cloudwatch put-metric-alarm --cli-input-json file://aws/json/alarm-config.json
