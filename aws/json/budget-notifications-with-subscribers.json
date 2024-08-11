@@ -3,12 +3,12 @@
         "Notification": {
             "ComparisonOperator": "GREATER_THAN",
             "NotificationType": "ACTUAL",
-            "Threshold": 80,
+            "Threshold": 10,
             "ThresholdType": "PERCENTAGE"
         },
         "Subscribers": [
             {
-                "Address": "example@example.com",
+                "Address": "***REMOVED***",
                 "SubscriptionType": "EMAIL"
             }
         ]

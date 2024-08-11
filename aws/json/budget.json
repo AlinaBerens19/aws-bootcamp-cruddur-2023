@@ -1,9 +1,9 @@
 {
     "BudgetLimit": {
-        "Amount": "100",
+        "Amount": "10",
         "Unit": "USD"
     },
-    "BudgetName": "Example Tag Budget",
+    "BudgetName": "10USD Budget",
     "BudgetType": "COST",
     "CostFilters": {
         "TagKeyValue": [
@@ -27,5 +27,21 @@
         "Start": 1477958399,
         "End": 3706473600
     },
-    "TimeUnit": "MONTHLY"
+    "TimeUnit": "MONTHLY",
+    "NotificationsWithSubscribers": [
+        {
+            "Notification": {
+                "NotificationType": "ACTUAL",
+                "ComparisonOperator": "GREATER_THAN",
+                "Threshold": 10,
+                "ThresholdType": "PERCENTAGE"
+            },
+            "Subscribers": [
+                {
+                    "SubscriptionType": "SNS",
+                    "Address": "arn:aws:sns:us-east-1:010928211139:billing-alarm"
+                }
+            ]
+        }
+    ]
 }
