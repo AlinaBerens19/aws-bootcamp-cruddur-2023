@@ -1,5 +1,5 @@
 # Use an official Node.js image as a base
-FROM node:22.6.0
+FROM node:22.6.0-slim
 
 # Copy all files from the current directory to /frontend-react-js in the container
 COPY . /frontend-react-js
