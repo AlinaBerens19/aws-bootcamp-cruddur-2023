@@ -62,6 +62,7 @@ def data_create_message():
 
 @app.route("/api/activities/home", methods=['GET'])
 def data_home():
+  print("Home activities endpoint was called")  # Debugging line
   data = HomeActivities.run()
   return data, 200
 
@@ -114,4 +115,4 @@ def data_activities_reply(activity_uuid):
   return
 
 if __name__ == "__main__":
-  app.run(debug=True)
+    app.run(debug=True, host="0.0.0.0", port=4567)
