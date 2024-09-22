@@ -1,7 +1,6 @@
 from flask import Flask
 from flask import request
 from flask_cors import CORS, cross_origin
-import os
 
 from services.home_activities import *
 from services.user_activities import *
@@ -22,7 +21,24 @@ from opentelemetry.sdk.trace import TracerProvider
 from opentelemetry.sdk.trace.export import BatchSpanProcessor, SimpleSpanProcessor  # Import both processors
 from opentelemetry.sdk.trace.export import ConsoleSpanExporter
 
+# XRay ------------------
+import os
+from aws_xray_sdk.core import xray_recorder
+from aws_xray_sdk.ext.flask.middleware import XRayMiddleware
 
+# Ensure that AWS_XRAY_URL environment variable is set
+xray_url = os.getenv("AWS_XRAY_URL")  # Fallback to default address if not set
+
+# Configure the X-Ray recorder with the service name and dynamic naming
+xray_recorder.configure(
+    service="backend-flask", 
+    dynamic_naming=xray_url  # Ensure the format is correct, e.g., "*.mysite.com"
+)
+
+# Assuming 'app' is your Flask app instance
+XRayMiddleware(app, xray_recorder)
+
+# -----------------------
 
 # Honeycomb
 # Initialize tracing and an exporter that can send data to Honeycomb
