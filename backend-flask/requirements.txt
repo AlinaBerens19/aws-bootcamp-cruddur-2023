@@ -1,7 +1,11 @@
 flask
 flask-cors
 
+aws-xray-sdk
+
 opentelemetry-instrumentation
 opentelemetry-distro
 opentelemetry-exporter-otlp
+opentelemetry-instrumentation-flask
+opentelemetry.instrumentation.requests
 
