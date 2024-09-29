@@ -1,7 +1,6 @@
 from flask import Flask
 from flask import request
 from flask_cors import CORS, cross_origin
-import os
 
 from services.home_activities import *
 from services.user_activities import *
@@ -22,7 +21,43 @@ from opentelemetry.sdk.trace import TracerProvider
 from opentelemetry.sdk.trace.export import BatchSpanProcessor, SimpleSpanProcessor  # Import both processors
 from opentelemetry.sdk.trace.export import ConsoleSpanExporter
 
+# Initialize automatic instrumentation with Flask
+app = Flask(__name__)
+FlaskInstrumentor().instrument_app(app)
+RequestsInstrumentor().instrument()
 
+# XRay ------------------
+import os
+from aws_xray_sdk.core import xray_recorder
+from aws_xray_sdk.ext.flask.middleware import XRayMiddleware
+
+# CloudWatch ------------
+import watchtower
+import logging
+from time import strftime
+
+# Configuring Logger to Use CloudWatch
+# LOGGER = logging.getLogger(__name__)
+# LOGGER.setLevel(logging.DEBUG)
+# console_handler = logging.StreamHandler()
+# cw_handler = watchtower.CloudWatchLogHandler(log_group="cruddur")
+# LOGGER.addHandler(console_handler)
+# LOGGER.addHandler(cw_handler)
+# LOGGER.info("test-log")
+
+# Ensure that AWS_XRAY_URL environment variable is set
+# xray_url = os.getenv("AWS_XRAY_URL")  # Fallback to default address if not set
+
+# Configure the X-Ray recorder with the service name and dynamic naming
+# xray_recorder.configure(
+#     service="bootcamp", 
+#     dynamic_naming=xray_url  # Ensure the format is correct, e.g., "*.mysite.com"
+# )
+
+# Assuming 'app' is your Flask app instance
+# XRayMiddleware(app, xray_recorder)
+
+# -----------------------
 
 # Honeycomb
 # Initialize tracing and an exporter that can send data to Honeycomb
@@ -38,10 +73,6 @@ trace.set_tracer_provider(provider)
 tracer = trace.get_tracer(__name__)
 
 # Honeycomb
-# Initialize automatic instrumentation with Flask
-app = Flask(__name__)
-FlaskInstrumentor().instrument_app(app)
-RequestsInstrumentor().instrument()
 
 frontend = os.getenv('FRONTEND_URL')
 backend = os.getenv('BACKEND_URL')
@@ -53,6 +84,13 @@ cors = CORS(
   allow_headers="content-type,if-modified-since",
   methods="OPTIONS,GET,HEAD,POST"
 )
+
+# @app.after_request
+# def after_request(response):
+#     timestamp = strftime('[%Y-%b-%d %H:%M]')
+#     LOGGER.error('%s %s %s %s %s', timestamp, request.remote_addr, request.method, request.scheme, request.full_path)
+#     return response
+
 
 @app.route("/api/message_groups", methods=['GET'])
 def data_message_groups():
@@ -92,7 +130,7 @@ def data_create_message():
 @app.route("/api/activities/home", methods=['GET'])
 def data_home():
   print("Home activities endpoint was called")  # Debugging line
-  data = HomeActivities.run()
+  data = HomeActivities.run(logger=LOGGER)
   return data, 200
 
 @app.route("/api/activities/@<string:handle>", methods=['GET'])
