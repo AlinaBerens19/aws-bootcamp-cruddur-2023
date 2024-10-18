@@ -1,6 +1,6 @@
 from datetime import datetime, timedelta, timezone
 class HomeActivities:
-  def run(logger):
+  def run():
     # To save dinero
     # logger.info("home activities")
     now = datetime.now(timezone.utc).astimezone()
