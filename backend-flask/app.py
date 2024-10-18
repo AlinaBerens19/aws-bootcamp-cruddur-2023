@@ -1,7 +1,5 @@
-from flask import Flask
-from flask import request
+from flask import Flask, request
 from flask_cors import CORS, cross_origin
-
 from services.home_activities import *
 from services.user_activities import *
 from services.create_activity import *
@@ -18,16 +16,41 @@ from opentelemetry.instrumentation.flask import FlaskInstrumentor
 from opentelemetry.instrumentation.requests import RequestsInstrumentor
 from opentelemetry.exporter.otlp.proto.grpc.trace_exporter import OTLPSpanExporter
 from opentelemetry.sdk.trace import TracerProvider
-from opentelemetry.sdk.trace.export import BatchSpanProcessor, SimpleSpanProcessor  # Import both processors
+from opentelemetry.sdk.trace.export import BatchSpanProcessor, SimpleSpanProcessor
 from opentelemetry.sdk.trace.export import ConsoleSpanExporter
 
 # Initialize automatic instrumentation with Flask
-app = Flask(__name__)
+app = Flask(__name__)  # Make sure app is defined before using it
 FlaskInstrumentor().instrument_app(app)
 RequestsInstrumentor().instrument()
 
-# XRay ------------------
+# Rollbar ----------------
 import os
+import rollbar
+import rollbar.contrib.flask
+from flask import got_request_exception
+
+# Rollbar ----------------------------------------------
+rollbar_access_token = os.getenv('ROLLBAR_ACCESS_TOKEN')
+
+@app.before_request
+def setup_rollbar():
+    """init rollbar module"""
+    rollbar.init(
+        # access token
+        rollbar_access_token,
+        # environment name
+        'production',
+        # server root directory, makes tracebacks prettier
+        root=os.path.dirname(os.path.realpath(__file__)),
+        # flask already sets up logging
+        allow_logging_basic_config=False
+    )
+
+    # send exceptions from `app` to rollbar, using flask's signal system.
+    got_request_exception.connect(rollbar.contrib.flask.report_exception, app)
+
+# XRay ------------------
 from aws_xray_sdk.core import xray_recorder
 from aws_xray_sdk.ext.flask.middleware import XRayMiddleware
 
@@ -44,15 +67,6 @@ from time import strftime
 # LOGGER.addHandler(console_handler)
 # LOGGER.addHandler(cw_handler)
 # LOGGER.info("test-log")
-
-# Ensure that AWS_XRAY_URL environment variable is set
-# xray_url = os.getenv("AWS_XRAY_URL")  # Fallback to default address if not set
-
-# Configure the X-Ray recorder with the service name and dynamic naming
-# xray_recorder.configure(
-#     service="bootcamp", 
-#     dynamic_naming=xray_url  # Ensure the format is correct, e.g., "*.mysite.com"
-# )
 
 # Assuming 'app' is your Flask app instance
 # XRayMiddleware(app, xray_recorder)
@@ -85,12 +99,7 @@ cors = CORS(
   methods="OPTIONS,GET,HEAD,POST"
 )
 
-# @app.after_request
-# def after_request(response):
-#     timestamp = strftime('[%Y-%b-%d %H:%M]')
-#     LOGGER.error('%s %s %s %s %s', timestamp, request.remote_addr, request.method, request.scheme, request.full_path)
-#     return response
-
+# API Endpoints
 
 @app.route("/api/message_groups", methods=['GET'])
 def data_message_groups():
@@ -104,7 +113,7 @@ def data_message_groups():
 @app.route("/api/messages/@<string:handle>", methods=['GET'])
 def data_messages(handle):
   user_sender_handle = 'andrewbrown'
-  user_receiver_handle = request.args.get('user_reciever_handle')
+  user_receiver_handle = request.args.get('user_receiver_handle')
 
   model = Messages.run(user_sender_handle=user_sender_handle, user_receiver_handle=user_receiver_handle)
   if model['errors'] is not None:
@@ -120,7 +129,7 @@ def data_create_message():
   user_receiver_handle = request.json['user_receiver_handle']
   message = request.json['message']
 
-  model = CreateMessage.run(message=message,user_sender_handle=user_sender_handle,user_receiver_handle=user_receiver_handle)
+  model = CreateMessage.run(message=message, user_sender_handle=user_sender_handle, user_receiver_handle=user_receiver_handle)
   if model['errors'] is not None:
     return model['errors'], 422
   else:
@@ -130,7 +139,7 @@ def data_create_message():
 @app.route("/api/activities/home", methods=['GET'])
 def data_home():
   print("Home activities endpoint was called")  # Debugging line
-  data = HomeActivities.run(logger=LOGGER)
+  data = HomeActivities.run()
   return data, 200
 
 @app.route("/api/activities/@<string:handle>", methods=['GET'])
@@ -163,6 +172,11 @@ def data_activities():
   else:
     return model['data'], 200
   return
+
+@app.route('/rollbar/test')
+def rollbar_test():
+  rollbar.report_message('Hi, Alina!', 'warning')
+  return 'Hi, Alina!'
 
 @app.route("/api/activities/<string:activity_uuid>", methods=['GET'])
 def data_show_activity(activity_uuid):
