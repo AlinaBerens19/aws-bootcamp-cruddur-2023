@@ -6,11 +6,17 @@
     "features": {
         "ghcr.io/devcontainers/features/aws-cli:1": {}
     },
+    "remoteEnv": {
+        "AWS_ACCESS_KEY_ID": "${AWS_ACCESS_KEY_ID}",
+        "AWS_SECRET_ACCESS_KEY": "${AWS_SECRET_ACCESS_KEY}",
+        "AWS_REGION": "${AWS_REGION}"
+    },
     "customizations": {
         "vscode": {
             "extensions": [
                 "ms-azuretools.vscode-docker",
-                "ms-python.python"
+                "ms-python.python",
+                "dracula-theme.theme-dracula"
             ]
         }
     }
