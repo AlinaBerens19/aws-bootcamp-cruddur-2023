@@ -19,18 +19,22 @@ import { Amplify } from 'aws-amplify';
 
 Amplify.configure({
   AWS_PROJECT_REGION: process.env.REACT_APP_AWS_PROJECT_REGION,
-  aws_cognito_region: process.env.REACT_APP_AWS_COGNITO_REGION,
+  aws_cognito_region: process.env.REACT_APP_AWS_PROJECT_REGION,
   aws_user_pools_id: process.env.REACT_APP_AWS_USER_POOLS_ID,
   aws_user_pools_web_client_id: process.env.REACT_APP_CLIENT_ID,
   oauth: {},
   Auth: {
     // Commented out as we are not using an Identity Pool
     // identityPoolId: process.env.REACT_APP_IDENTITY_POOL_ID, // REQUIRED - Cognito Identity Pool ID
-    region: process.env.REACT_APP_AWS_PROJECT_REGION, // REQUIRED - Amazon Cognito Region
-    userPoolId: process.env.REACT_APP_AWS_USER_POOLS_ID, // OPTIONAL - Amazon Cognito User Pool ID
-    userPoolWebClientId: process.env.REACT_APP_AWS_USER_POOLS_WEB_CLIENT_ID, // OPTIONAL - Amazon Cognito Web Client ID
+    // region: process.env.REACT_APP_AWS_PROJECT_REGION, // REQUIRED - Amazon Cognito Region
+    // userPoolId: process.env.REACT_APP_AWS_USER_POOLS_ID, // OPTIONAL - Amazon Cognito User Pool ID
+    // userPoolWebClientId: process.env.REACT_APP_CLIENT_ID, // OPTIONAL - Amazon Cognito Web Client ID
+    region: "us-east-1", // REQUIRED - Amazon Cognito Region
+    userPoolId: "us-east-1_VTtHxGOLk", // OPTIONAL - Amazon Cognito User Pool ID
+    userPoolWebClientId: "3hn5npqgtmvit80ubtl3ethto9", // OPTIONAL - Amazon Cognito Web Client ID
   },
 });
+
 
 const router = createBrowserRouter([
   {

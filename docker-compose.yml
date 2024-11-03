@@ -31,10 +31,10 @@ services:
     environment:
       # REACT_APP_BACKEND_URL: "https://4567-${GITPOD_WORKSPACE_ID}.${GITPOD_WORKSPACE_CLUSTER_HOST}"
       REACT_APP_BACKEND_URL: "https://${CODESPACE_NAME}-4567.${GITHUB_CODESPACES_PORT_FORWARDING_DOMAIN}"
-      REACT_APP_AWS_PROJECT_REGION: "${AWS_DEFAULT_REGION}"
-      REACT_APP_AWS_COGNITO_REGION: "${AWS_DEFAULT_REGION}"
-      REACT_APP_AWS_USER_POOLS_ID: "us-east-1_VTtHxGOLk"
-      REACT_APP_CLIENT_ID: "3hn5npqgtmvit80ubtl3ethto9"
+      # REACT_APP_AWS_PROJECT_REGION: "us-east-1"
+      # REACT_APP_AWS_COGNITO_REGION: "us-east-1"
+      # REACT_APP_AWS_USER_POOLS_ID: "us-east-1_VTtHxGOLk"
+      # REACT_APP_CLIENT_ID: "3hn5npqgtmvit80ubtl3ethto9"
       NODE_OPTIONS: --openssl-legacy-provider
     build:
       context: ./frontend-react-js
