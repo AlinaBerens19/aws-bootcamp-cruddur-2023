@@ -36,6 +36,8 @@ services:
       # REACT_APP_AWS_USER_POOLS_ID: "us-east-1_VTtHxGOLk"
       # REACT_APP_CLIENT_ID: "3hn5npqgtmvit80ubtl3ethto9"
       NODE_OPTIONS: --openssl-legacy-provider
+    env_file:
+      - .env  # Load environment variables from .env file  
     build:
       context: ./frontend-react-js
       dockerfile: Dockerfile

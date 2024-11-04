@@ -35,6 +35,10 @@ Amplify.configure({
   },
 });
 
+console.log("AWS Region:", process.env.REACT_APP_AWS_REGION);
+console.log("User Pool ID:", process.env.REACT_APP_AWS_USER_POOL_ID);
+console.log("Client ID:", process.env.REACT_APP_AWS_CLIENT_ID);
+
 
 const router = createBrowserRouter([
   {
