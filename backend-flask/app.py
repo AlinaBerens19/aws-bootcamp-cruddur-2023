@@ -10,6 +10,7 @@ from services.messages import *
 from services.create_message import *
 from services.show_activity import *
 
+
 # Honeycomb
 from opentelemetry import trace
 from opentelemetry.instrumentation.flask import FlaskInstrumentor
@@ -19,8 +20,17 @@ from opentelemetry.sdk.trace import TracerProvider
 from opentelemetry.sdk.trace.export import BatchSpanProcessor, SimpleSpanProcessor
 from opentelemetry.sdk.trace.export import ConsoleSpanExporter
 
+from lib.cognito_token_verification import CognitoJwtToken, extract_access_token, TokenVerifyError
+
 # Initialize automatic instrumentation with Flask
 app = Flask(__name__)  # Make sure app is defined before using it
+
+cognito_verification_token = CognitoJwtToken(
+  user_pool_id= os.getenv('AWS_COGNITO_USER_POOL_ID'),
+  user_pool_client_id= os.getenv('AWS_COGNITO_USER_POOL_CLIENT_ID'),
+  region= os.getenv('AWS_DEFAULT_REGION')
+)
+
 FlaskInstrumentor().instrument_app(app)
 RequestsInstrumentor().instrument()
 
@@ -95,12 +105,13 @@ frontend = os.getenv('FRONTEND_URL')
 backend = os.getenv('BACKEND_URL')
 origins = [frontend, backend]
 cors = CORS(
-  app, 
-  resources={r"/api/*": {"origins": origins}},
-  expose_headers="location,link",
-  allow_headers="content-type,if-modified-since",
-  methods="OPTIONS,GET,HEAD,POST"
+    app,
+    resources={r"/api/*": {"origins": origins}},
+    headers=["Content-Type", "Authorization", "traceparent"],
+    expose_headers=["Authorization"],
+    methods=["OPTIONS", "GET", "HEAD", "POST"],
 )
+
 
 
 # Requests
@@ -150,11 +161,26 @@ def data_create_message():
     return model['data'], 200
   return
 
-@app.route("/api/activities/home", methods=['GET'])
+@app.route("/api/activities/home", methods=["GET"])
 def data_home():
-  print("Home activities endpoint was called")  # Debugging line
-  data = HomeActivities.run()
-  return data, 200
+
+    # ----jwt auth-----
+    access_token = extract_access_token(request.headers)
+    try:
+        claims = cognito_verification_token.verify(access_token)
+        # authenticated request
+        app.logger.debug("authenticated")
+        app.logger.debug(claims)
+        app.logger.debug(claims["username"])
+        # data = HomeActivities.run(cognito_user_id=claims["username"])
+    except TokenVerifyError as e:
+        # unauthenticated request
+        app.logger.debug(e)
+        app.logger.debug("unauthenticated")
+        # data = HomeActivities.run()
+    # ---------------
+    return 200
+
 
 @app.route("/api/activities/@<string:handle>", methods=['GET'])
 def data_handle(handle):

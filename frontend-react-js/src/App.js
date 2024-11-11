@@ -30,8 +30,8 @@ Amplify.configure({
     // userPoolId: process.env.REACT_APP_AWS_USER_POOLS_ID, // OPTIONAL - Amazon Cognito User Pool ID
     // userPoolWebClientId: process.env.REACT_APP_CLIENT_ID, // OPTIONAL - Amazon Cognito Web Client ID
     region: "us-east-1", // REQUIRED - Amazon Cognito Region
-    userPoolId: "us-east-1_VTtHxGOLk", // OPTIONAL - Amazon Cognito User Pool ID
-    userPoolWebClientId: "3hn5npqgtmvit80ubtl3ethto9", // OPTIONAL - Amazon Cognito Web Client ID
+    userPoolId: "us-east-1_rJ9aMNgG6", // OPTIONAL - Amazon Cognito User Pool ID
+    userPoolWebClientId: "4o2hbkaho1va8n96rfg6c9r7n6", // OPTIONAL - Amazon Cognito Web Client ID
   },
 });
 

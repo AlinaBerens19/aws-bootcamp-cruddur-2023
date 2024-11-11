@@ -17,12 +17,13 @@ export default function SignupPage() {
   const [password, setPassword] = React.useState('');
   const [errors, setErrors] = React.useState('');
 
+
   const onsubmit = async (event) => {
     event.preventDefault();
     setErrors('')
     try {
         const { user } = await Auth.signUp({
-          username: username,
+          username: email,
           password: password,
           attributes: {
               name: name,
