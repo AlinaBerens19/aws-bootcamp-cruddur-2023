@@ -99,6 +99,13 @@ provider.add_span_processor(simple_processor)
 trace.set_tracer_provider(provider)
 tracer = trace.get_tracer(__name__)
 
+# JWT
+cognito_jwt_token = CognitoJwtToken(
+    region=os.getenv("AWS_DEFAULT_REGION"),
+    user_pool_client_id=os.getenv("AWS_COGNITO_USER_POOL_CLIENT_ID"),
+    user_pool_id=os.getenv("AWS_COGNITO_USER_POOL_ID"),
+)
+
 # Honeycomb
 
 frontend = os.getenv('FRONTEND_URL')
@@ -108,11 +115,9 @@ cors = CORS(
     app,
     resources={r"/api/*": {"origins": origins}},
     headers=["Content-Type", "Authorization", "traceparent"],
-    expose_headers=["Authorization"],
-    methods=["OPTIONS", "GET", "HEAD", "POST"],
+    expose_headers="Authorization",
+    methods="OPTIONS,GET,HEAD,POST",
 )
-
-
 
 # Requests
 
@@ -161,9 +166,16 @@ def data_create_message():
     return model['data'], 200
   return
 
+import sys
+
 @app.route("/api/activities/home", methods=["GET"])
 def data_home():
-
+    # app.logger.debug('AUTH TOKEN-----')
+    # app.logger.debug(
+    #   request.headers.get('Authorization')
+    # )
+    # data = HomeActivities.run()
+    # return data, 200
     # ----jwt auth-----
     access_token = extract_access_token(request.headers)
     try:
